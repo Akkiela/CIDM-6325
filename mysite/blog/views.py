@@ -142,13 +142,20 @@ def post_comment(request, post_id):
     comment = None
     # A comment was posted
     form = CommentForm(data=request.POST)
-    if form.is_valid():
+    ratingForm = RatingForm(data=request.POST)
+    if form.is_valid() and ratingForm.is_valid():
         # Create a Comment object without saving it to the database
         comment = form.save(commit=False)
         # Assign the post to the comment
         comment.post = post
         # Save the comment to the database
         comment.save()
+
+        rating = ratingForm.save(commit=False)
+        rating.object_id = comment.id
+        rating.content_type = comment._meta.get_field(
+            'rating').related_model._meta.label_lower
+        rating.save()
     return render(
         request,
         'blog/post/comment.html',

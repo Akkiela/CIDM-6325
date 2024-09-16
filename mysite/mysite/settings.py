@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
     'taggit',
+    'star_ratings',
     'blog.apps.BlogConfig',
 ]
 
