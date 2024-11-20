@@ -3,7 +3,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from taggit.managers import TaggableManager
-from star_ratings.models import Rating
 
 
 class PublishedManager(models.Manager):
@@ -14,8 +13,6 @@ class PublishedManager(models.Manager):
 
 
 class Post(models.Model):
-    tags = TaggableManager()
-
     class Status(models.TextChoices):
         DRAFT = 'DF', 'Draft'
         PUBLISHED = 'PB', 'Published'
@@ -77,8 +74,6 @@ class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     active = models.BooleanField(default=True)
-    rating = models.ForeignKey(
-        Rating, on_delete=models.CASCADE, related_name='comments')
 
     class Meta:
         ordering = ['created']
