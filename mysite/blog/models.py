@@ -8,11 +8,11 @@ from taggit.managers import TaggableManager
 class PublishedManager(models.Manager):
     def get_queryset(self):
         return (
-            super().get_queryset().filter(status=Post.Status.PUBLISHED)
+            super().get_queryset().filter(status=BaseModel.Status.PUBLISHED)
         )
 
 
-class Post(models.Model):
+class BaseModel(models.Model):
     class Status(models.TextChoices):
         DRAFT = 'DF', 'Draft'
         PUBLISHED = 'PB', 'Published'
@@ -22,12 +22,6 @@ class Post(models.Model):
         max_length=250,
         unique_for_date='publish'
     )
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='blog_posts'
-    )
-    body = models.TextField()
     publish = models.DateTimeField(default=timezone.now)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -42,6 +36,7 @@ class Post(models.Model):
     tags = TaggableManager()
 
     class Meta:
+        abstract = True
         ordering = ['-publish']
         indexes = [
             models.Index(fields=['-publish']),
@@ -62,6 +57,25 @@ class Post(models.Model):
         )
 
 
+class Post(BaseModel):
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='blog_posts'
+    )
+    body = models.TextField()
+
+
+class Recipe(BaseModel):
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='blog_recipes'
+    )
+    description = models.CharField(max_length=500)
+    instructions = models.TextField()
+
+
 class Comment(models.Model):
     post = models.ForeignKey(
         Post,
@@ -71,6 +85,75 @@ class Comment(models.Model):
     name = models.CharField(max_length=80)
     email = models.EmailField()
     body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['created']
+        indexes = [
+            models.Index(fields=['created']),
+        ]
+
+    def __str__(self):
+        return f'Comment by {self.name} on {self.post}'
+
+
+class RecipeComment(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipecomments'
+    )
+    name = models.CharField(max_length=80)
+    email = models.EmailField()
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['created']
+        indexes = [
+            models.Index(fields=['created']),
+        ]
+
+    def __str__(self):
+        return f'Comment by {self.name} on {self.recipe}'
+
+
+class RecipeRating(models.Model):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='recipe_rating'
+    )
+    name = models.CharField(max_length=80)
+    email = models.EmailField()
+    rating = models.IntegerField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['created']
+        indexes = [
+            models.Index(fields=['created']),
+        ]
+
+    def __str__(self):
+        return f'Comment by {self.name} on {self.recipe}'
+
+
+class PostRating(models.Model):
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='post_rating'
+    )
+    name = models.CharField(max_length=80)
+    email = models.EmailField()
+    rating = models.IntegerField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     active = models.BooleanField(default=True)
