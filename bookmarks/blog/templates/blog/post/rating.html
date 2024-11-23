@@ -1,0 +1,12 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Add Rating{% endblock %}
+
+{% block content %}
+{% if rating %}
+<h2>Your rating has been added.</h2>
+<p><a href="{{ post.get_absolute_url }}">Back to the post</a></p>
+{% else %}
+{% include "blog/post/includes/rating_form.html" %}
+{% endif %}
+{% endblock %}
