@@ -3,7 +3,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from taggit.managers import TaggableManager
-from django.utils.text import slugify
 
 
 class PublishedManager(models.Manager):
@@ -11,19 +10,7 @@ class PublishedManager(models.Manager):
         return (
             super().get_queryset().filter(status=BaseModel.Status.PUBLISHED)
         )
-MEAL_TYPES=(
-    ('breakfast','Breakfast'),
-    ('lunch','Lunch'),
-    ('dinner', 'Dinner')
-)
 
-CUISINE_TYPES=(
-    ('indian','Indian'),
-    ('american','American'),
-    ('thai', 'Thai'),
-    ('chinese','Chinese'),
-    ('italian','Italian')
-)
 
 class BaseModel(models.Model):
     class Status(models.TextChoices):
@@ -179,46 +166,3 @@ class PostRating(models.Model):
 
     def __str__(self):
         return f'Comment by {self.name} on {self.post}'
-    
-
-class Image(models.Model):
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        related_name='Recipeimages_created',
-        on_delete=models.CASCADE,
-    )
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-        related_name='recipe_image'
-    )
-    title = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200, blank=True)
-    url = models.URLField(max_length=2000)
-    image = models.ImageField(upload_to='images/%Y/%m/%d/')
-    description = models.TextField(blank=True)
-    recipetype = models.CharField(max_length=50,choices=MEAL_TYPES,default='breakfast')
-    cuisinetype = models.CharField(max_length=50,choices=CUISINE_TYPES,default='indian')
-    created = models.DateTimeField(auto_now_add=True)
-    users_like = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name='recipeimages_liked',
-        blank=True,
-    )
-    
-    class Meta:
-        indexes = [
-            models.Index(fields=['-created']),
-        ]
-        ordering = ['-created']
-
-    def __str__(self):
-        return self.title
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        super().save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        return reverse('images:detail', args=[self.id, self.slug])

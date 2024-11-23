@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Comment, Post, Recipe, RecipeComment, RecipeRating, PostRating, Image
+from .models import Comment, Post, Recipe, RecipeComment, RecipeRating, PostRating
 
 
 @admin.register(Post)
@@ -56,8 +56,3 @@ class PostRatingAdmin(admin.ModelAdmin):
                     'rating', 'created', 'active']
     list_filter = ['active', 'created', 'updated']
     search_fields = ['name', 'email', 'rating']
-
-@admin.register(Image)
-class RecipeImageAdmin(admin.ModelAdmin):
-    list_display = ['title', 'slug', 'image', 'recipetype', 'cuisinetype', 'created']
-    list_filter = ['created']

@@ -44,10 +44,7 @@ INSTALLED_APPS = [
     'images.apps.ImagesConfig',
     'easy_thumbnails',
     'taggit',
-    'star_ratings',
     'blog.apps.BlogConfig',
-    'django.contrib.sites',
-    'django.contrib.sitemaps',
 ]
 
 MIDDLEWARE = [
