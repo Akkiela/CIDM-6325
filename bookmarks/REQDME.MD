@@ -1,0 +1,3 @@
+Assignment 0  - Best options are used -- implemented baseModel class as abstract class and inherited Recipe and Post child model classes. In the admin site, recipes, post, recipecomments, postcomments, reciperating and post rating systems are implemented in blog application. 
+Assignment 1 - Best Options are used in the model to add isRecipeOrPost variables to categorize recipe or post and bookmark it is implemented to bookmark any image from external website and all images were listed in admin site as well. Also Sing in integration with google is implemented successfully.
+Assignment 2 - Best options Stripe test account is created and integrated. Also subscription plan of stripe is implemented.
