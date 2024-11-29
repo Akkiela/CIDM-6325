@@ -29,4 +29,14 @@ urlpatterns = [
         cache_page(60 * 15)(views.StudentCourseDetailView.as_view()),
         name='student_course_detail_module',
     ),
+     path(
+        'module/<int:module_id>/content/<model_name>/create/',
+        views.ContentCreateUpdateView.as_view(),
+        name='module_content_create',
+    ),
+    path(
+        'module/<int:module_id>/content/<model_name>/<id>/',
+        views.ContentCreateUpdateView.as_view(),
+        name='module_content_update',
+    ),
 ]
