@@ -18,7 +18,7 @@ def course_detail(request,course_id,module_id=None):
             selected_module = get_object_or_404(Module,pk=module_id)
         else:
             selected_module = modules.first()
-        studen_works = StudentWork.objects.filter(module=selected_module)if selected_module else[]
+        student_works = StudentWork.objects.filter(module=selected_module)if selected_module else[]
         if request.method == "POST":
             form =StudentWorkForm(request.POST,request.FILES)
             if form.is_valid():
@@ -32,7 +32,7 @@ def course_detail(request,course_id,module_id=None):
             'course' :course,
             'modules':modules,
             'selected_module':selected_module,
-            'studen_works':studen_works,
+            'student_works':student_works,
             'form':form
         })
 def edit_student_work(request,work_id):

@@ -11,7 +11,7 @@
             float:right;
             width:75%;
         }
-        .clearfix:after{
+        .clearfix::after{
             content:"";
             clear:both;
             display:table;
@@ -19,7 +19,7 @@
     </style>
 </head>
 <body>
-    <div>class="clearfix"
+    <div> class="clearfix"
         <div id ="left">
             <ul>
                 {% for module in modules %}
