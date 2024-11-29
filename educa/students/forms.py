@@ -1,10 +1,7 @@
 from django import forms
 
 from courses.models import Course
-
-from django.forms.models import inlineformset_factory
-
-from courses.models import Course, Module
+from .models import StudentWork
 
 
 class CourseEnrollForm(forms.Form):
@@ -17,12 +14,7 @@ class CourseEnrollForm(forms.Form):
         super(CourseEnrollForm, self).__init__(*args, **kwargs)
         self.fields['course'].queryset = Course.objects.all()
 
-
-
-ModuleFormSet = inlineformset_factory(
-    Course,
-    Module,
-    fields=['title', 'description'],
-    extra=2,
-    can_delete=True,
-)
+class StudentWorkForm(forms.ModelForm):
+    class Meta:
+        model = StudentWork
+        fields =['content_type','content','image','video_url','file']

@@ -1,4 +1,4 @@
-from courses.models import Course,Content, Module, Subject
+from courses.models import Course,Module
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -6,22 +6,56 @@ from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from django.views.generic.list import ListView
-from django.core.cache import cache
-from django.db.models import Count
-from django.forms.models import modelform_factory
-from django.views.generic.base import TemplateResponseMixin, View
-from django.shortcuts import get_object_or_404, redirect
-from .forms import ModuleFormSet
+from django.shortcuts import render,redirect,get_object_or_404
 
+from .forms import CourseEnrollForm,StudentWorkForm
+from .models import StudentWork
 
-from .forms import CourseEnrollForm
+def course_detail(request,course_id,module_id=None):
+        course = get_object_or_404(Course,pk=course_id)
+        modules = Module.objects.filter(course=course)
+        if module_id:
+            selected_module = get_object_or_404(Module,pk=module_id)
+        else:
+            selected_module = modules.first()
+        studen_works = StudentWork.objects.filter(module=selected_module)if selected_module else[]
+        if request.method == "POST":
+            form =StudentWorkForm(request.POST,request.FILES)
+            if form.is_valid():
+                student_work = form.save(commit=False)
+                student_work.module = selected_module
+                student_work.save()
+                return redirect('course_detail', course_id=course_id,module_id=selected_module.id)
+        else:
+            form =StudentWorkForm()
+        return render(request,'students/course/course_detail.html',{
+            'course' :course,
+            'modules':modules,
+            'selected_module':selected_module,
+            'studen_works':studen_works,
+            'form':form
+        })
+def edit_student_work(request,work_id):
+        student_work =get_object_or_404(StudentWork,pk=work_id)
+        if(request.method =="POST"):
+            form = StudentWorkForm(request.POST,request.FILES,instance=student_work)
+            if form.is_valid():
+                    form.save()
+                    return redirect('course_detail',course_id=student_work.module.course.id,module_id=student_work.module.id)            
+        else:
+            form = StudentWorkForm(instance=student_work)
+        return render(request,'students/course/edit_student_work.html',{
+            'form':form,
+            'student_work': student_work
+        })
+    
+def delete_student_work(request,work_id):
+        student_work = get_object_or_404(StudentWork,pk=work_id)
+        Course_id = student_work.module.course.id
+        Module_id = student_work.module.id
+        student_work.delete()
+        return redirect('course_detail',course_id=Course_id,Module_id=Module_id)
 
-from braces.views import CsrfExemptMixin, JsonRequestResponseMixin
-from django.apps import apps
-from django.contrib.auth.mixins import (
-    LoginRequiredMixin,
-    PermissionRequiredMixin,
-)
 
 class StudentRegistrationView(CreateView):
     template_name = 'students/student/registration.html'
@@ -83,199 +117,9 @@ class StudentCourseDetailView(LoginRequiredMixin, DetailView):
             # get first module
             context['module'] = course.modules.all()[0]
         return context
+
+
+
     
-class ContentCreateUpdateView(TemplateResponseMixin, View):
-    module = None
-    model = None
-    obj = None
-    template_name = 'students/manage/content/form.html'
 
-    def get_model(self, model_name):
-        if model_name in ['text', 'video', 'image', 'file']:
-            return apps.get_model(
-                app_label='courses', model_name=model_name
-            )
-        return None
-
-    def get_form(self, model, *args, **kwargs):
-        Form = modelform_factory(
-            model, exclude=['owner', 'order', 'created', 'updated']
-        )
-        return Form(*args, **kwargs)
-
-    def dispatch(self, request, module_id, model_name, id=None):
-        self.module = get_object_or_404(
-            Module, id=module_id, course__owner=request.user
-        )
-        self.model = self.get_model(model_name)
-        if id:
-            self.obj = get_object_or_404(
-                self.model, id=id, owner=request.user
-            )
-        return super().dispatch(request, module_id, model_name, id)
-
-    def get(self, request, module_id, model_name, id=None):
-        form = self.get_form(self.model, instance=self.obj)
-        return self.render_to_response(
-            {'form': form, 'object': self.obj}
-        )
-
-    def post(self, request, module_id, model_name, id=None):
-        form = self.get_form(
-            self.model,
-            instance=self.obj,
-            data=request.POST,
-            files=request.FILES,
-        )
-        if form.is_valid():
-            obj = form.save(commit=False)
-            obj.owner = request.user
-            obj.save()
-            if not id:
-                # new content
-                Content.objects.create(module=self.module, item=obj)
-            return redirect('module_content_list', self.module.id)
-        return self.render_to_response(
-            {'form': form, 'object': self.obj}
-        )
-
-class ContentDeleteView(View):
-    def post(self, request, id):
-        content = get_object_or_404(
-            Content, id=id, module__course__owner=request.user
-        )
-        module = content.module
-        content.item.delete()
-        content.delete()
-        return redirect('module_content_list', module.id)
-
-
-class ModuleContentListView(TemplateResponseMixin, View):
-    template_name = 'students/manage/module/content_list.html'
-
-    def get(self, request, module_id):
-        module = get_object_or_404(
-            Module, id=module_id, course__owner=request.user
-        )
-        return self.render_to_response({'module': module})
-
-
-class ModuleOrderView(CsrfExemptMixin, JsonRequestResponseMixin, View):
-    def post(self, request):
-        for id, order in self.request_json.items():
-            Module.objects.filter(
-                id=id, course__owner=request.user
-            ).update(order=order)
-        return self.render_json_response({'saved': 'OK'})
-
-
-class ContentOrderView(CsrfExemptMixin, JsonRequestResponseMixin, View):
-    def post(self, request):
-        for id, order in self.request_json.items():
-            Content.objects.filter(
-                id=id, module__course__owner=request.user
-            ).update(order=order)
-        return self.render_json_response({'saved': 'OK'})
-
-
-class CourseListView(TemplateResponseMixin, View):
-    model = Course
-    template_name = 'students/course/list.html'
-
-    def get(self, request, subject=None):
-        subjects = cache.get('all_subjects')
-        if not subjects:
-            subjects = Subject.objects.annotate(
-                total_courses=Count('courses')
-            )
-            cache.set('all_subjects', subjects)
-        all_courses = Course.objects.annotate(
-            total_modules=Count('modules')
-        )
-        if subject:
-            subject = get_object_or_404(Subject, slug=subject)
-            key = f'subject_{subject.id}_courses'
-            courses = cache.get(key)
-            if not courses:
-                courses = all_courses.filter(subject=subject)
-                cache.set(key, courses)
-        else:
-            courses = cache.get('all_courses')
-            if not courses:
-                courses = all_courses
-                cache.set('all_courses', courses)
-        return self.render_to_response(
-            {
-                'subjects': subjects,
-                'subject': subject,
-                'courses': courses,
-            }
-        )
-
-
-class CourseDetailView(DetailView):
-    model = Course
-    template_name = 'students/course/detail.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['enroll_form'] = CourseEnrollForm(
-            initial={'course': self.object}
-        )
-        return context
     
-class CourseModuleUpdateView(TemplateResponseMixin, View):
-    template_name = 'students/manage/module/formset.html'
-    course = None
-
-    def get_formset(self, data=None):
-        return ModuleFormSet(instance=self.course, data=data)
-
-    def dispatch(self, request, pk):
-        self.course = get_object_or_404(
-            Course, id=pk, owner=request.user
-        )
-        return super().dispatch(request, pk)
-
-    def get(self, request, *args, **kwargs):
-        formset = self.get_formset()
-        return self.render_to_response(
-            {'course': self.course, 'formset': formset}
-        )
-
-    def post(self, request, *args, **kwargs):
-        formset = self.get_formset(data=request.POST)
-        if formset.is_valid():
-            formset.save()
-            return redirect('manage_course_list')
-        return self.render_to_response(
-            {'course': self.course, 'formset': formset}
-        )
-    
-class CourseModuleUpdateView(TemplateResponseMixin, View):
-    template_name = 'students/manage/module/formset.html'
-    course = None
-
-    def get_formset(self, data=None):
-        return ModuleFormSet(instance=self.course, data=data)
-
-    def dispatch(self, request, pk):
-        self.course = get_object_or_404(
-            Course, id=pk, owner=request.user
-        )
-        return super().dispatch(request, pk)
-
-    def get(self, request, *args, **kwargs):
-        formset = self.get_formset()
-        return self.render_to_response(
-            {'course': self.course, 'formset': formset}
-        )
-
-    def post(self, request, *args, **kwargs):
-        formset = self.get_formset(data=request.POST)
-        if formset.is_valid():
-            formset.save()
-            return redirect('manage_course_list')
-        return self.render_to_response(
-            {'course': self.course, 'formset': formset}
-        )

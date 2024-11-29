@@ -1,5 +1,6 @@
 from django.urls import path
 from django.views.decorators.cache import cache_page
+from .views import course_detail,edit_student_work,delete_student_work
 
 from . import views
 
@@ -29,44 +30,8 @@ urlpatterns = [
         cache_page(60 * 15)(views.StudentCourseDetailView.as_view()),
         name='student_course_detail_module',
     ),
-    path(
-        '<pk>/module/',
-        views.CourseModuleUpdateView.as_view(),
-        name='course_module_update',
-    ),
-    path(
-        'module/<int:module_id>/content/<model_name>/create/',
-        views.ContentCreateUpdateView.as_view(),
-        name='module_content_create',
-    ),
-    path(
-        'module/<int:module_id>/content/<model_name>/<id>/',
-        views.ContentCreateUpdateView.as_view(),
-        name='module_content_update',
-    ),
-    path(
-        'content/<int:id>/delete/',
-        views.ContentDeleteView.as_view(),
-        name='module_content_delete',
-    ),
-    path(
-        'module/<int:module_id>/',
-        views.ModuleContentListView.as_view(),
-        name='module_content_list',
-    ),
-    path(
-        'module/order/',
-        views.ModuleOrderView.as_view(),
-        name='module_order',
-    ),
-    path(
-        'content/order/',
-        views.ContentOrderView.as_view(),
-        name='content_order',
-    ),
-    path(
-        '<pk>/module/',
-        views.CourseModuleUpdateView.as_view(),
-        name='course_module_update',
-    ),
+    path('course/<int:course_id>/', course_detail, name='course_detail'),
+    path('course/<int:course_id>/module/<int:module_id>/',course_detail, name='course_detail'),
+    path('edit_work/<int:work_id>/',edit_student_work,name='edit_student_work'),
+    path('delete_work/<int:work_id>/',delete_student_work,name='delete_student_work'),
 ]

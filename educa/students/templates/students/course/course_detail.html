@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> {{course.title}}</title>
+    <style>
+        #left{
+            float:left;
+            width:20%;
+        }
+        #right{
+            float:right;
+            width:75%;
+        }
+        .clearfix:after{
+            content:"";
+            clear:both;
+            display:table;
+        }
+    </style>
+</head>
+<body>
+    <div>class="clearfix"
+        <div id ="left">
+            <ul>
+                {% for module in modules %}
+                    <li>
+                        <a href="{%url 'course_detail' course.id module.id %}">{{module.title}}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div id="right">
+            <h2>{{selected_module.title}}</h2>
+            <h3> Student Work</h3>
+            {% for work in student_works %}
+                <div>
+                    <p>{{work.content}}</p>
+                    {% if work.image %}
+                        <img src="{{work.image.url}}" alt="Image" style="max-width:100 px; max-height:100px;">
+                    {% endif %}
+                    {% if work.video_url %}
+                        <a href="{{work.video_url}}" target="_blank">Watch Video </a>
+                    {% endif %}
+                    {% if work.file %}
+                        <a href="{{work.file.url}}" >Download File</a>
+                    {% endif %}
+                    <a href="{% url 'edit_student_work' work.id %}" > Edit</a>
+                    <a href="{% url 'delete_student_work' work.id %}" > Delete</a>
+                </div>
+            {% endfor %}
+            <h3>Upload New Content</h3>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{form.as_p}}
+                <button type="submit">Upload</button>
+            </form>
+        </div>
+    </div>
+</body>
+
