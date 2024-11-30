@@ -1,5 +1,10 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
+{% load cache %}
+{% load static %}
+
+{% block title %}
+  {{ object.title }}
+{% endblock %}
 <head>
     <title> {{course.title}}</title>
     <style>
@@ -11,15 +16,17 @@
             float:right;
             width:75%;
         }
-        .clearfix::after{
-            content:"";
-            clear:both;
-            display:table;
+        .clearfix::after
+        {
+            content: "";
+            clear: both;
+            display: table;
         }
     </style>
 </head>
-<body>
-    <div> class="clearfix"
+{% block content %}
+
+    <div class="clearfix"></div>
         <div id ="left">
             <ul>
                 {% for module in modules %}
@@ -29,7 +36,7 @@
                 {% endfor %}
             </ul>
         </div>
-        <div id="right">
+        <div id="right" class="module">
             <h2>{{selected_module.title}}</h2>
             <h3> Student Work</h3>
             {% for work in student_works %}
@@ -56,5 +63,5 @@
             </form>
         </div>
     </div>
-</body>
+{% endblock %}
 
