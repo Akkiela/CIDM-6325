@@ -20,23 +20,17 @@ class Subject(models.Model):
 
 class Course(models.Model):
     owner = models.ForeignKey(
-        User,
-        related_name='courses_created',
-        on_delete=models.CASCADE
+        User, related_name='courses_created', on_delete=models.CASCADE
     )
     subject = models.ForeignKey(
-        Subject,
-        related_name='courses',
-        on_delete=models.CASCADE
+        Subject, related_name='courses', on_delete=models.CASCADE
     )
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
     overview = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     students = models.ManyToManyField(
-        User,
-        related_name='courses_joined',
-        blank=True
+        User, related_name='courses_joined', blank=True
     )
 
     class Meta:
@@ -48,9 +42,7 @@ class Course(models.Model):
 
 class Module(models.Model):
     course = models.ForeignKey(
-        Course,
-        related_name='modules',
-        on_delete=models.CASCADE
+        Course, related_name='modules', on_delete=models.CASCADE
     )
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
@@ -65,9 +57,7 @@ class Module(models.Model):
 
 class Content(models.Model):
     module = models.ForeignKey(
-        Module,
-        related_name='contents',
-        on_delete=models.CASCADE
+        Module, related_name='contents', on_delete=models.CASCADE
     )
     content_type = models.ForeignKey(
         ContentType,
@@ -86,9 +76,7 @@ class Content(models.Model):
 
 class ItemBase(models.Model):
     owner = models.ForeignKey(
-        User,
-        related_name='%(class)s_related',
-        on_delete=models.CASCADE
+        User, related_name='%(class)s_related', on_delete=models.CASCADE
     )
     title = models.CharField(max_length=250)
     created = models.DateTimeField(auto_now_add=True)

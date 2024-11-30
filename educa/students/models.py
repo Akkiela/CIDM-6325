@@ -7,16 +7,22 @@ from django.db import models
 from django.template.loader import render_to_string
 
 from courses.fields import OrderField
+from django.core.validators import FileExtensionValidator 
 
 # Create your models here.
 class StudentWork(models.Model):
+    title = models.CharField(max_length=255)
+    date = models.DateField(auto_now_add=True)
     module = models.ForeignKey(Module,on_delete=models.CASCADE)
     content_type = models.CharField(max_length=50)
     content = models.TextField(null= True ,blank=True)
-    image = models.ImageField(upload_to= 'uploads/images/',null =True , blank=True)
-    video_url =models.URLField(null=True, blank=True)
-    file = models.FileField(upload_to='uploads/files/',null=True,blank=True)
-    
+    image = models.ImageField(upload_to = 'uploads/images/',null =True , blank=True, validators=[FileExtensionValidator(['png'])])
+    video =models.FileField(upload_to = 'uploads/videos/',null =True , blank=True, validators=[FileExtensionValidator(['mp4'])])
+    file = models.FileField(upload_to = 'uploads/files/',null =True , blank=True, validators=[FileExtensionValidator(['pdf'])])
+    link = models.URLField(blank=True, null =True)
+
+    def __str__(self):
+        return self.title
 
 class ItemBase(models.Model):
    

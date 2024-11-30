@@ -10,6 +10,17 @@ from django.shortcuts import render,redirect,get_object_or_404
 
 from .forms import CourseEnrollForm,StudentWorkForm
 from .models import StudentWork
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def portfolio(request):
+    modules=Module.objects.all()
+    if request.user.is_superuser or request.user.groups.filter(name='Instructor').exists():
+        student_works = StudentWork.objects.all()
+    else:
+        student_works = StudentWork.objects.filter(student=request.user)
+    modules = Module.objects.all()
+    return render(request, 'students/course/portfolio.html',{'modules': modules, 'student_works':student_works})
 
 def course_detail(request,course_id,module_id=None):
         course = get_object_or_404(Course,pk=course_id)
@@ -117,7 +128,6 @@ class StudentCourseDetailView(LoginRequiredMixin, DetailView):
             # get first module
             context['module'] = course.modules.all()[0]
         return context
-
 
 
     

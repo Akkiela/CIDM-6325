@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Delete Student Work </title>
+</head>
+<body>
+    <h2>Delete Student Work</h2>
+    <form method="post">
+        {% csrf_token %}
+        <p>Are you sure you want to delete "{{work.title}}"?</p>>
+        <button type="submit">Delete</button>
+    </form>
+</body>
+</html>

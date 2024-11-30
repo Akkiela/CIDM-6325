@@ -1,0 +1,21 @@
+{% extends base.html %}
+{% block content %}
+    <h1> {{work.title}} </h1>
+    <p> {{work.date}}</p>
+    <p> {{work.content}}</p>
+    {% if work.image %}
+        <img src="{{work.image.url}}" alt="{{ work.title}}">
+    {% endif %}
+    {% if work.video %}
+        <video controls>
+            <source src="{{work.video.url}}" type="video/mp4">
+        </video>
+    {% endif %}
+    {% if work.file %}
+        <a href="{{work.file.url}}">Open PDF</a>
+    {% endif %}
+    {% if work.link %}
+        <a href="{{work.link}}">Related Link</a>
+    {% endif %}
+    {% endblock %}
+    

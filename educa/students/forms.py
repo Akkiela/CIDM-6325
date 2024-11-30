@@ -17,4 +17,9 @@ class CourseEnrollForm(forms.Form):
 class StudentWorkForm(forms.ModelForm):
     class Meta:
         model = StudentWork
-        fields =['content_type','content','image','video_url','file']
+        fields =['title','content','image','video','file','link']
+        widgets = {
+            'image':forms.ClearableFileInput(attrs={'accept':'image/png'}),
+            'video':forms.ClearableFileInput(attrs={'accept': 'video/mp4'}),
+            'file': forms.ClearableFileInput(attrs={'accept':'application/pdf'}),
+        }

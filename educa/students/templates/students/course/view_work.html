@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Portfolio</title>
+    </head>
+<body>
+    <div>
+        <h2>Modules</h2>
+        <ul>
+            {% for module in modules %}
+                <li>{{module.title}}</li>
+            {% endfor}
+        </ul>
+    </div>
+    <div>
+        <h2>Student Work</h2>
+        {% for work in student_works %}
+            <div>
+                <h3>{{ work.title }}</h3>
+                <p>{{ work.date }}</p>
+                <p>{{ work.content }}</p>
+                {% if work.image %}
+                    <img src="{{ work.image.url }}" alt="Image">
+                {% endif %}
+                {% if work.video %}
+                    <video controls>
+                        <source src="{{ work.video.url }}" type="video/mp4">
+                    </video> 
+                {% endif %}
+                {% if work.file %}
+                    <a href="{{ work.file.url}}">Download PDF</a>"
+                {% endif %}
+                {% if work.link %}
+                    <a href="{{ work.link.url}}">External Link</a>"
+                {% endif %}                
+            </div>
+        {% endfor %}
+    </div>    
+</body>
+</html>

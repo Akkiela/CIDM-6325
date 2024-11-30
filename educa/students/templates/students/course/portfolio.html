@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Portfolio</title>
+    </head>
+<body>
+    <div>
+        <h2>Modules</h2>
+        <ul>
+            {% for module in modules %}
+                <li>{{module.title}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
+        <h2>Student Work</h2>
+        {% for work in student_works %}
+            <div>
+                <h3>{{ work.title }}</h3>
+                <p>{{ work.date }}</p>
+                <a href="{% url 'work_detail' work.id %}">{{work.title}}</a> - {{work.date}}"
+                {% if request.user == work.student or request.user.is_staff %}
+                    <a href="{% url 'edit_work' work.pk %}">Edit</a>"
+                    <a href="{% url 'delete_work' work.pk %}">Delete</a>"
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    <div>
+        <h2>Upload student Work</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+</body>
+</html>
