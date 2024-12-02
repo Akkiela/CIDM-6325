@@ -65,7 +65,7 @@ class Post(BaseModel):
         related_name='blog_posts'
     )
     body = models.TextField()
-    subscription_plan = models.ForeignKey(SubscriptionPlan,on_delete=models.CASCADE)
+    
 
 
 class Recipe(BaseModel):
@@ -76,7 +76,7 @@ class Recipe(BaseModel):
     )
     description = models.CharField(max_length=500)
     instructions = models.TextField()
-    subscription_plan = models.ForeignKey(SubscriptionPlan,on_delete=models.CASCADE)
+    
 
 
 class Comment(models.Model):
