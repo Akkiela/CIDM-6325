@@ -18,5 +18,5 @@ urlpatterns = [
         name='product_detail',
     ),
 
-    path('subscriptionPlans/',plans_view, name='plans')
+    path('subscriptionPlans/',plans_view, name='plans'),
 ]

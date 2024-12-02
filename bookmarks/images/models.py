@@ -81,3 +81,20 @@ class Image(models.Model):
 
     def get_absolute_url(self):
         return reverse('images:detail', args=[self.id, self.slug])
+
+class Bookmark(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='images_created_recipes',
+        on_delete=models.CASCADE,
+    )
+    recipe = models.ForeignKey(Recipe,on_delete=models.CASCADE)
+    image_url = models.URLField(max_length=200)
+    bookmarked_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together =('user','recipe','image_url')
+    
+    def __str__(self):
+        return f"{self.user.username} bookarked {self.image_url} for {self.recipe.title}"
+    

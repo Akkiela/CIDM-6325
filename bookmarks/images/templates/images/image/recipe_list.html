@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% for recipe in recipes %}
+  <div>
+    <h2>{{recipe.title}}</h2>
+    <p>{{recipe.description}}</p>
+    <a href="{% url 'bookmark_image' recipe.id %}">Bookmark Image</a>
+  </div>
+{% endfor %}

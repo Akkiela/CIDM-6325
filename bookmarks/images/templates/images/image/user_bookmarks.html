@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Your bookmarked images{% endblock %}
+
+{% block content %}
+{% for bookmark in bookmarks %}
+<div>
+    <h1>{{bookmark.recipe.title}}</h1>
+    <img src=""{{bookmark.image_url}}" alt="Bookmarked Image">
+    <p>Bookmarked at: {{ bookmark.bookmarked_at }}</p>
+</div>
+{% endfor %}  
+{% endblock %}

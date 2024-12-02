@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Bookmark an image for {{recipe.title}} {% endblock %}
+
+{% block content %}
+  <h1>Bookmark an image for {{recipe.title}}</h1>
+  <form method="post">
+    {{ form.as_p }}
+    {% csrf_token %}
+    <button type="submit" value="Bookmark it!">
+  </form>
+{% endblock %}

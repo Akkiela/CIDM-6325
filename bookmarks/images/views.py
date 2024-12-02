@@ -5,8 +5,9 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from .forms import ImageCreateForm
-from .models import Image
+from .forms import ImageCreateForm,BookmarkForm
+from .models import Image, Bookmark
+from blog.models import Recipe
 
 
 @login_required
@@ -90,3 +91,25 @@ def image_list(request):
         'images/image/list.html',
         {'section': 'images', 'images': images},
     )
+
+def recipe_list(request):
+    recipes = Recipe.objects.all()
+    return render(request,'images/image/recipe_list.html', {'recipes':recipes})
+
+@login_required
+def bookmark_image(request,recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    if request.method == 'POST':
+        form = BookmarkForm(request.POST)
+        if form.is_valid():
+            image_url = form.cleaned_data['image_url']
+            Bookmark.objects.get_or_create(user=request.user, recipe=recipe, image_url=image_url)
+            return redirect('recipe_list')
+        else:
+            form=BookmarkForm()
+        return render(request,'images/image/bookmark_image.html',{'form':form,'recipe':recipe})
+
+@login_required
+def user_bookmarks(request):
+    bookmarks = Bookmark.objects.filter(user=request.user)
+    return render(request,'images/image/user_bookmarks.html',{'bookmarks':bookmarks})

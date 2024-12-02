@@ -40,3 +40,7 @@ class ImageCreateForm(forms.ModelForm):
         if commit:
             image.save()
         return image
+
+class BookmarkForm(forms.Form):
+    image_url = forms.URLField(label='Image URL', max_length=200)
+
