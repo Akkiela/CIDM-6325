@@ -1,7 +1,12 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render,redirect
 
 from cart.forms import CartAddProductForm
-from .models import Category, Product
+from shop.models import Category, Product, SubscriptionPlan, Subscription
+
+from django.conf import settings
+import stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
 
 
 def product_list(request, category_slug=None):
@@ -32,3 +37,8 @@ def product_detail(request, id, slug):
         'shop/product/detail.html',
         {'product': product, 'cart_product_form': cart_product_form},
     )
+
+def plans_view(request):
+    plans = SubscriptionPlan.objects.all()
+    return render(request, 'shop/subscriptionPlans.html',{'plans':plans})
+

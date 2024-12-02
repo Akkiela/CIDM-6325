@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .views import plans_view
 
 app_name = 'shop'
 
@@ -16,4 +17,6 @@ urlpatterns = [
         views.product_detail,
         name='product_detail',
     ),
+
+    path('subscriptionPlans/',plans_view, name='plans')
 ]
